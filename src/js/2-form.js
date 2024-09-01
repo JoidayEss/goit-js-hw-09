@@ -3,36 +3,37 @@ const formData = {
   message: '',
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const savedData = localStorage.getItem('feedback-form-state');
-  if (savedData) {
-    const parsedData = JSON.parse(savedData);
-    formData.email = parsedData.email || '';
-    formData.message = parsedData.message || '';
-    document.getElementById('email').value = formData.email;
-    document.getElementById('message').value = formData.message;
-  }
-});
+const form = document.querySelector('.feedback-form');
+const emailInput = form.querySelector('input[name="email"]');
+const messageTextarea = form.querySelector('textarea[name="message"]');
 
-document.getElementById('feedback-form').addEventListener('input', event => {
+const savedData = localStorage.getItem('feedback-form-state');
+if (savedData) {
+  const savedFormData = JSON.parse(savedData);
+  emailInput.value = savedFormData.email;
+  messageTextarea.value = savedFormData.message;
+  formData.email = savedFormData.email;
+  formData.message = savedFormData.message;
+}
+
+form.addEventListener('input', event => {
   const { name, value } = event.target;
-  if (formData.hasOwnProperty(name)) {
-    formData[name] = value;
-    localStorage.setItem('feedback-form-state', JSON.stringify(formData));
-  }
+  formData[name] = value;
+  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
 });
 
-document.getElementById('feedback-form').addEventListener('submit', event => {
+form.addEventListener('submit', event => {
   event.preventDefault();
-  const { email, message } = formData;
-  if (!email || !message) {
+
+  if (!formData.email || !formData.message) {
     alert('Fill please all fields');
-  } else {
-    console.log(formData);
-    localStorage.removeItem('feedback-form-state');
-    document.getElementById('email').value = '';
-    document.getElementById('message').value = '';
-    formData.email = '';
-    formData.message = '';
+    return;
   }
+
+  console.log(formData);
+
+  localStorage.removeItem('feedback-form-state');
+  formData.email = '';
+  formData.message = '';
+  form.reset();
 });
